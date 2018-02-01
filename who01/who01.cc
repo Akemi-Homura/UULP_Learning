@@ -3,33 +3,45 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include <stdlib.h>
+# include <string.h>
+# include <time.h>
 #define SHOWHOST
 
 void show_info(utmpx * record);
+void show_host(char* host);
+void show_time(timeval dis_time);
 
 int main(){
-    utmpx current_record;
-    int reclen = sizeof(utmpx);
-    int utmpx_fd;
-    if((utmpx_fd = open(_PATH_UTMPX,O_RDONLY)) == -1){
-        fprintf(stderr,"open %s file failed\n",_PATH_UTMPX);
-        exit(1);
-    }
-    while(read(utmpx_fd,&current_record,reclen) == reclen){
-        show_info(&current_record);
+    utmpx* current_record;
+    while((current_record = getutxent()) != NULL){
+        show_info(current_record);
     }
     return 0;
 }
 
 void show_info(utmpx * record){
+    if(record->ut_type != USER_PROCESS){
+        return;
+    }
     printf("%-8.8s",record->ut_user);
     printf(" ");
     printf("%-8.8s",record->ut_line);
     printf(" ");
-    printf("%10d",record->ut_tv.tv_usec);
+    show_time(record->ut_tv);
     printf(" ");
 #ifdef SHOWHOST
-    printf("(%s)",record->ut_host);
+    show_host(record->ut_host);
 #endif
     printf("\n");
+}
+
+void show_host(char* host_name){
+    if(strlen(host_name) != 0){
+        printf("(%s)",host_name);
+    }
+}
+
+void show_time(timeval dis_time){
+    char *cp = ctime(&dis_time.tv_sec);
+    printf("%12.12s",cp+4);
 }
