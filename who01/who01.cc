@@ -16,6 +16,7 @@ int main(){
     while((current_record = getutxent()) != NULL){
         show_info(current_record);
     }
+    endutxent();
     return 0;
 }
 
