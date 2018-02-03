@@ -7,7 +7,7 @@
 # define BUFFERSIZE 4096
 # define COPYMODE 0644
 # define ARGUVER "-i"
-# define OVERWRITEINFO "overwrite %s? (y/n [n])"
+# define OVERWRITEINFO "overwrite %s? (y/n [n]) "
 # define NOTOVERWRITE "not overwritten\n"
 
 void oops(const char*,const char*);
@@ -73,5 +73,5 @@ void oops(const char * s1,const char * s2){
 }
 
 bool is_file_exist(const char * filename){
-    return access(filename,W_OK) == 0;
+    return access(filename,F_OK) == 0;
 }
