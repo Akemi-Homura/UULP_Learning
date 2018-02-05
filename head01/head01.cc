@@ -61,6 +61,7 @@ void display(const char *path,int lines){
         fprintf(stderr,"Error: read error ");
         perror(path);
     }
+    fclose(file);
 }
 
 bool check_permission(const char*path){
