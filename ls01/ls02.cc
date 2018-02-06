@@ -3,6 +3,9 @@
 # include <stdlib.h>
 # include <string.h>
 # include <unistd.h>
+# include <vector>
+# include <string>
+# include <algorithm>
 # define M_ALL 1
 # define M_DEFAULT 0
 # define ARGU_ALL "a"
@@ -15,7 +18,7 @@
 # define RUN_TYPE RELEASE
 
 void do_ls(const char*);
-void display(const char*);
+void display(std::vector<std::string>);
 void process_argv(const char*);
 void process_option(const char*);
 void show_usage(FILE*stream=stderr);
@@ -77,6 +80,7 @@ void show_usage(FILE* stream){
 }
 
 void do_ls(const char * path){
+    std::vector<std::string> names;
     has_exectute = true;
     if(!is_file_exits(path)){
         fprintf(stderr,FILE_NOT_EXIST_MSG,path);
@@ -88,15 +92,19 @@ void do_ls(const char * path){
         fprintf(stderr,"ls01: cannot open %s\n",path);
     }else{
         while((direntp = readdir(dir_ptr)) != NULL){
-            display(direntp->d_name);
+            names.push_back(direntp->d_name);
         }
         closedir(dir_ptr);
+        display(names);
     }
 }
 
-void display(const char* msg){
-    if(mode == M_ALL || msg[0] != '.'){
-        printf("%s\n",msg);
+void display(std::vector<std::string> names){
+    sort(names.begin(),names.end());
+    for(std::string name : names){
+        if(mode == M_ALL || name[0] != '.'){
+            printf("%s\n",name.c_str());
+        }
     }
 }
 
