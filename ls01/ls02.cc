@@ -19,9 +19,9 @@
 
 # define ARGU_ALL 'a'
 # define ARGU_DETAIL 'l'
-# define USAGE_INFO "ls01 [-a] [file ...]\n"
-# define ILLEGAL_OP_INFO "ls01: illegal option -- %s\n"
-# define FILE_NOT_EXIST_MSG "ls01: %s: No such file or directory\n"
+# define USAGE_INFO "ls02 [-a] [file ...]\n"
+# define ILLEGAL_OP_INFO "ls02: illegal option -- %s\n"
+# define FILE_NOT_EXIST_MSG "ls02: %s: No such file or directory\n"
 # define TIMEOFFSET 4
 
 # define DEBUG 0
@@ -86,7 +86,7 @@ void process_option(const char* op){
                 mode |= S_DETAIL;
                 break;
             default:
-                fprintf(stderr,"ls01: illegal option -- %c\n",op[i]);
+                fprintf(stderr,"ls02: illegal option -- %c\n",op[i]);
                 show_usage();
                 exit(1);
         }
@@ -110,7 +110,7 @@ void do_ls(const char * path){
     DIR* dir_ptr;
     dirent* direntp;
     if((dir_ptr = opendir(path)) == NULL){
-        fprintf(stderr,"ls01: cannot open %s\n",path);
+        fprintf(stderr,"ls02: cannot open %s\n",path);
     }else{
         while((direntp = readdir(dir_ptr)) != NULL){
             if((mode & S_ALL) || direntp->d_name[0]!='.'){
