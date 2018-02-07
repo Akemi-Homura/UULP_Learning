@@ -12,11 +12,13 @@
 # include <pwd.h>
 # include <uuid/uuid.h>
 # include <grp.h>
-# define M_ALL 1
-# define M_DEFAULT 0
-# define M_DETAIL 2
-# define ARGU_ALL "a"
-# define ARGU_DETAIL "l"
+/* modes */
+# define S_ALL 04
+# define S_DETAIL 02
+# define S_DEFAULT 00
+
+# define ARGU_ALL 'a'
+# define ARGU_DETAIL 'l'
 # define USAGE_INFO "ls01 [-a] [file ...]\n"
 # define ILLEGAL_OP_INFO "ls01: illegal option -- %s\n"
 # define FILE_NOT_EXIST_MSG "ls01: %s: No such file or directory\n"
@@ -34,7 +36,7 @@ void show_usage(FILE*stream=stderr);
 void illegal_option(const char*);
 void show_file_info(const char*,const struct stat*);
 void dostat(const char*);
-char* merge_str(const char*,const char*);
+void merge_path(const char*,const char*,char*&);
 bool is_file_exits(const char*);
 bool dirent_cmp(const dirent* d1,const dirent* d2);
 void oops(const char*,const char*);
@@ -42,8 +44,8 @@ void mode_to_letters(mode_t,char *);
 char* uid_to_name(const uid_t);
 char* gid_to_name(const gid_t);
 
-int mode = M_DEFAULT;
-bool has_exectute = false;
+static int mode = S_DEFAULT;
+static bool has_exectute = false;
 
 int main(int argc,char * argv[]){
     if(argc == 1){
@@ -74,23 +76,23 @@ void process_argv(const char* msg){
 }
 
 void process_option(const char* op){
-#if RUN_TYPE == DEBUG
-    printf("Processing option: %s\n",op);
-#endif
-    if(strcmp(op,ARGU_ALL) == 0){
-#if RUN_TYPE == DEBUG
-        printf("Mode changing\n");
-#endif
-        mode = M_ALL;
-    }else if(strcmp(op,ARGU_DETAIL) == 0){
-        mode = M_DETAIL;
-    }else {
-        fprintf(stderr,ILLEGAL_OP_INFO,op);
-        show_usage();
-        exit(1);
+    int len = strlen(op);
+    for(int i=0;i<len;i++){
+        switch(op[i]){
+            case ARGU_ALL:
+                mode |= S_ALL;
+                break;
+            case ARGU_DETAIL:
+                mode |= S_DETAIL;
+                break;
+            default:
+                fprintf(stderr,"ls01: illegal option -- %c\n",op[i]);
+                show_usage();
+                exit(1);
+        }
     }
 #if RUN_TYPE == DEBUG
-    printf("Process option: %s finished.\n",op);
+    printf("Process option: %s finished.\nmode: %d\n",op,mode);
 #endif
 }
 
@@ -111,7 +113,9 @@ void do_ls(const char * path){
         fprintf(stderr,"ls01: cannot open %s\n",path);
     }else{
         while((direntp = readdir(dir_ptr)) != NULL){
-            contents.push_back(direntp);
+            if((mode & S_ALL) || direntp->d_name[0]!='.'){
+                contents.push_back(direntp);
+            }
         }
         display(path,contents);
         closedir(dir_ptr);
@@ -126,15 +130,20 @@ void display(/*parent path*/const char* p_path,std::vector<dirent*> contents){
 #if RUN_TYPE == DEBUG
     printf("Sort complete\n");
 #endif
+    struct stat* file_info;
+    if((file_info = (struct stat*)malloc(sizeof(struct stat))) == NULL){
+        perror("malloc error\n");
+        exit(1);
+    }
     for(dirent* content : contents){
-        if(mode == M_ALL || (mode == M_DEFAULT && content->d_name[0] != '.')){
+        if(!(mode & S_DETAIL)){
             printf("%s\n",content->d_name);
-        }else if(mode == M_DETAIL){
-            char *path = merge_str(merge_str(p_path,"/"),content->d_name);
+        }else if(mode & S_DETAIL){
+            char *path;
+            merge_path(p_path,content->d_name,path);
 #if RUN_TYPE == DEBUG
             printf("Merged path: %s\n",path);
 #endif
-            struct stat* file_info = (struct stat*)malloc(sizeof(struct stat));
             if(stat(path,file_info) == -1){
                 oops("Get status failed! ",path);
             }
@@ -142,8 +151,10 @@ void display(/*parent path*/const char* p_path,std::vector<dirent*> contents){
             printf("Stat file status successful\n");
 #endif
             show_file_info(content->d_name,file_info);
+            free(path);
         }
     }
+    free(file_info);
 }
 
 bool dirent_cmp(const dirent* d1,const dirent* d2){
@@ -219,14 +230,17 @@ void oops(const char* s1,const char* s2){
     exit(1);
 }
 
-char * merge_str(const char*s1,const char*s2){
+void merge_path(const char*s1,const char*s2,char*& res){
     int len1 = strlen(s1), len2 = strlen(s2);
-    int n_size = len1 + len2 + 1;
-    static char * res = (char*)malloc(n_size);
+    int n_size = len1 + len2 + 2;
+    if((res = (char*)malloc(n_size)) == NULL){
+        perror("malloc error\n");
+        exit(1);
+    }
     memcpy(res,s1,len1);
-    memcpy(res+len1,s2,len2);
-    res[len1+len2] = '\0';
-    return res;
+    res[len1]='/';
+    memcpy(res+len1+1,s2,len2);
+    res[len1+len2+1] = '\0';
 }
 
 bool is_file_exits(const char* path){
