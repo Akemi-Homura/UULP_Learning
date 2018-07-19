@@ -1,3 +1,6 @@
+#ifndef STAT_CHECK_H
+#define STAT_CHECK_H
+
 # include <stdio.h>
 # include <unistd.h>
 # include <stdlib.h>
@@ -18,3 +21,5 @@ bool is_readable(const char* path);
 bool is_writable(const char* path);
 
 void check_stat(const char*path,int& res);
+
+#endif
