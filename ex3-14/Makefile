@@ -8,7 +8,7 @@ $(target): $(sources)
 	$(CC) $(sources) $(CCFLAGS) -o $@
 
 clean:
-	rm -f cp03
+	rm -rf cp03 *.dSYM
 
 .PHONY: test
 test: $(target)
