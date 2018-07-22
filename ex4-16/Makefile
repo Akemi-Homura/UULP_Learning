@@ -8,6 +8,7 @@ $(target): $(sources)
 	$(CC) $(sources) $(CCFLAGS) -o $@
 
 clean:
+	rm -rf a.txt b.txt c.txt d1
 	rm -rf $(target) *.dSYM
 
 .PHONY: test
