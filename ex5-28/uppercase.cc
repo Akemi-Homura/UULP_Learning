@@ -11,6 +11,9 @@ int main(){
     }
 
     if(info.c_oflag & OLCUC){
-        printf("")
+        printf("OLCUC is on, since its bit is 1\n");
+    }else{
+        printf("OLCUC is off, sinze its bit is 0\n");
     }
+    return 0;
 }
