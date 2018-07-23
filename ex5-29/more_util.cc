@@ -41,20 +41,7 @@ void do_more(FILE* fp,int row_num){
                     fprintf(stderr,"Unexcepted reply %d\n",reply);
                     exit(1);
             }
-            printf("\33[A");
-        switch(reply){
-            case QUIT:
-                exit(0);
-            case NTL:
-                --num_of_lines;
-                break;
-            case NTP:
-                num_of_lines -= row_num;
-                break;
-            default:
-                fprintf(stderr,"Unexcepted reply %d\n",reply);
-                exit(1);
-        }
+            printf("\33[A\33[K");
         }
         printf("%s",buf);
         num_of_lines++;
