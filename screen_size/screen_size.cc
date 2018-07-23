@@ -7,11 +7,7 @@
 
 int main(){
     struct winsize wbuf;
-    int fd;
-    if((fd = open("/dev/ttys001",O_WRONLY)) == -1){
-        oops("Open tty ",1);
-    }
-    if(ioctl(fd,TIOCGWINSZ,&wbuf) == -1){
+    if(ioctl(0,TIOCGWINSZ,&wbuf) == -1){
         oops("ioctl",1);
     }
     printf("%d rows x %d cols\n",wbuf.ws_row,wbuf.ws_col);
