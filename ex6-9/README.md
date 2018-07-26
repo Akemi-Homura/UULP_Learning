@@ -1,0 +1,2 @@
+# sigdemo2
+修改termios中的ISIG标志使终端不能发送SIGINT信号
