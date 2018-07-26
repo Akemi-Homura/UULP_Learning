@@ -1,14 +1,24 @@
 # include <stdio.h>
 # include <unistd.h>
 # include <signal.h>
+# include <stdlib.h>
 
 # define SLPTIME 5
 
-int main(){
+int terminate_time;
+
+int main(int argc,char** argv){
     void f(int);
     signal(SIGINT,f);
-
-    for(int i=0;i<5;i++){
+    if(argc == 1){
+        terminate_time = 2;
+    }else{
+        terminate_time = atoi(argv[1]);
+        if(terminate_time < 1){
+            terminate_time = 1;
+        }
+    }
+    while(1){
         printf("Hello\n");
         sleep(SLPTIME);
     }
@@ -23,4 +33,7 @@ void f(int ){
         putchar('!');
     }
     putchar('\n');
+    if(--terminate_time == 0){
+        exit(0);
+    }
 }
