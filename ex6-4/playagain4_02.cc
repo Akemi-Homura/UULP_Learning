@@ -24,10 +24,11 @@ int main(){
     set_no_echo();
     set_no_delay();
 
-    void ctrl_c_handler(int);
-    signal(SIGINT,ctrl_c_handler);
-    signal(SIGQUIT,SIG_IGN);
+    void signal_handler(int);
+    signal(SIGINT,signal_handler);
+    signal(SIGQUIT,signal_handler);
     int res = get_response(ASK,TRIES);
+    tty_mode(TTY_MODE_RESET);
     return res;
 }
 
@@ -36,7 +37,6 @@ int get_response(const char* question,int maxtries){
     printf("%s(y/n)?\n",question);
     fflush(stdout);
     while(1){
-        sleep(SLPTIME);
         input = get_ok_char();
         if(input == C_YES){
             return RES_YES;
@@ -44,14 +44,15 @@ int get_response(const char* question,int maxtries){
         if(input == C_NO){
             return RES_NO;
         }
-        if(maxtries-- == 0){
+        if(--maxtries == 0){
             return RES_OUTTIME;
         }
     }
 }
 
-void ctrl_c_handler(int ){
-    exit(0);
+void signal_handler(int ){
+    tty_mode(TTY_MODE_RESET);
+    exit(2);
 }
 
 int get_ok_char(){
