@@ -1,8 +1,8 @@
 CXX = g++
 CXXFLAGS = -g3 -Wall -std=c++11 -l curses
 
-sources = bounceld.cc
-target = bounceld
+sources = bounce1d.cc
+target = bounce1d
 
 $(target): $(sources)
 	$(CXX) $^ $(CXXFLAGS) -o $@
