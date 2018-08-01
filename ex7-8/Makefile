@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -g3 -Wall -std=c++11 -l curses
 
-sources = hello1.cc
+sources = hello1.cc para_util.cc
 target = hello1
 
 $(target): $(sources)
