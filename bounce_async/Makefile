@@ -7,5 +7,9 @@ target = bounce_async
 $(target): $(sources)
 	$(CXX) $^ $(CXXFLAGS) -o $@
 
+.PHONY: test clean
 clean:
 	rm -rf *.dSYM $(target)
+
+test: $(target)
+	./$(target)
