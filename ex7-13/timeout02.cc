@@ -9,16 +9,17 @@
 # include "error_process.h"
 
 # define DELAY 500
-# define TTY "/dev/pts/1"
 
 pid_t pid;
 int timeout;
+char* tty;
 
 int main(int argc,char**argv){
     void kill_process(int);
 
     para_handler(argc,argv,pid,timeout);
-    printf("%d will be killed after %d seconds\n",pid,timeout);
+    printf("%d will be killed after %d seconds if no operation\n",pid,timeout);
+    tty = ttyname(STDIN_FILENO);
 
     signal(SIGALRM,kill_process);
     set_ticker(DELAY);
@@ -31,8 +32,8 @@ int main(int argc,char**argv){
 
 void kill_process(int){
     struct stat s_buf;
-    if(stat(TTY,&s_buf) == -1){
-        oops("stat ",TTY);
+    if(stat(tty,&s_buf) == -1){
+        oops("stat ",tty);
     }
 
     time_t now = time(NULL);
