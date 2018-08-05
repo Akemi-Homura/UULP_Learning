@@ -1,0 +1,2 @@
+# waitdemo1
+显示了子进程调用exit是如何触发wait返回父进程的
