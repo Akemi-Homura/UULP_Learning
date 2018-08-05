@@ -39,6 +39,10 @@ void parent_code(){
 }
 
 void child_exit_handler(int){
-    printf("child has exited\n");
+    int wait_rv,child_status;
+
+    wait_rv = wait(&child_status);
+    printf("done waiting for %d.\n",wait_rv);
+    printf("status: exit = %d, sig = %d, core = %d\n",WEXITSTATUS(child_status), WTERMSIG(child_status), WCOREDUMP(child_status));
     exit(0);
 }
