@@ -12,7 +12,7 @@ int main(){
 
     newhandler.sa_handler = inthandler;
 
-    newhandler.sa_flags = SA_RESETHAND | SA_RESTART;
+    newhandler.sa_flags = SA_RESETHAND | SA_RESTART | SA_NODEFER;
 
     sigemptyset(&blocked);
     sigaddset(&blocked,SIGQUIT);
