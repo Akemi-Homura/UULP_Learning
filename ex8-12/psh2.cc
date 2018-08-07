@@ -15,6 +15,7 @@
 # define RUNTYPE DEBUG
 
 # define KEY_DEL 127
+# define KEY_CD  4
 
 # define EXIT(x) {endwin(); exit(x);}
 
@@ -25,12 +26,13 @@ void show_hint();
 void get_eof();
 void do_shell();
 
-int numargs,row,col;
+int numargs,row,col,cIndex;
 char argbuf[ARGLEN];
 
 int main(){
     signal(SIGINT,ctrl_cq_handler);
     signal(SIGQUIT,ctrl_cq_handler);
+    signal(SIGCHLD,ctrl_cq_handler);
     init_curses();
     do_shell();
 
@@ -38,7 +40,7 @@ int main(){
 }
 
 void get_eof(){
-    if(col == 0){
+    if(cIndex != 0){
         BEEP;
     }else{
         EXIT(0);
@@ -55,9 +57,13 @@ void ctrl_cq_handler(int signum){
 }
 
 void execute(char **arglist){
+    // static char buf[100];
     int pid,exitstatus;
 
+    move(++row,0);
+    refresh();
     pid = fork();
+
     switch(pid){
         case -1:
             perror("fork failed");
@@ -68,7 +74,9 @@ void execute(char **arglist){
             EXIT(1);
         default:
             while( wait(&exitstatus) != pid);
-            printf("child exited with status %d, %d\n",exitstatus>>8,exitstatus&0377);
+            // sprintf(buf,"child exited with status %d, %d\n",exitstatus>>8,exitstatus&0377);
+            // mvaddstr(row,0,buf);
+            // refresh();
     }
 }
 
@@ -96,25 +104,28 @@ void do_shell(){
         arglist[i] = (char*)malloc(ARGLEN);
     }
 
-    int index = 0;
+    cIndex = 0;
     while(1){
         show_hint();
         while(1){
             char c = getch();
             if( c == '\n'){
-                if(index == 0 && numargs > 0){
-                    execute(arglist);
-                    numargs =  0;
+                if(cIndex == 0  ){
+                    if(numargs > 0){
+                        arglist[numargs] = NULL;
+                        execute(arglist);
+                        numargs =  0;
+                    }
                 }else{
                     ++numargs;
                 }
                 ++row;
-                index = 0;
+                cIndex = 0;
                 break;
-            }else if ( c == EOF){
+            }else if ( c == EOF || c == KEY_CD){
                 get_eof();
             }else{
-                arglist[numargs][index++] = c;
+                arglist[numargs][cIndex++] = c;
                 mvaddch(row,col++,c);
                 refresh();
             }
