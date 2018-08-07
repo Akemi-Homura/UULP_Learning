@@ -65,7 +65,7 @@ void on_input(int){
         mvaddch(1,1,c);
         refresh();
 #endif
-        if( c == 'Q' || c == EOF){
+        if( c == 'Q' || c == EOF || c == 4 ){
             done = 1;
         }else if( c == ' '){
             dir = -dir;

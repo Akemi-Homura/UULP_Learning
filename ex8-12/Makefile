@@ -1,10 +1,15 @@
 CXX = clang++
-CXXFLAGS = -g3 -Wall -std=c++11 -l curses
+CXXFLAGS = -g3 -Wall -std=c++11 -l curses -lrt
 
-sources = psh2.cc
-target	= psh2
+target = psh2 psh2_aio
 
-$(target): $(sources)
+all: $(target)
+
+
+psh2: psh2.cc
+	$(CXX) $^ $(CXXFLAGS) -o $@
+
+psh2_aio: psh2_aio.cc
 	$(CXX) $^ $(CXXFLAGS) -o $@
 
 clean:
