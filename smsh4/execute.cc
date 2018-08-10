@@ -1,5 +1,6 @@
 # include <stdio.h>
 # include <stdlib.h>
+# include "varlib.h"
 # include <unistd.h>
 # include <signal.h>
 # include <sys/wait.h>
@@ -8,6 +9,8 @@ int execute(char **argv){
     int pid;
     int child_info = -1;
 
+    extern char** environ;
+
     if( argv[0] == NULL){
         return 0;
     }
@@ -15,6 +18,7 @@ int execute(char **argv){
     if( (pid = fork()) ==-1){
         perror("fork");
     }else if( pid == 0 ){
+        environ = VLtable2environ();
         signal(SIGINT,SIG_DFL);
         signal(SIGQUIT,SIG_DFL);
         execvp(argv[0], argv);
