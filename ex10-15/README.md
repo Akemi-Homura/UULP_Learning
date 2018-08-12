@@ -1,2 +1,4 @@
 # progteee
 将输入传递给另一个程序并且传递给stdout
+
+重定位命令行参数传进来的程序的输入，progtee中从stdin读入数据后同时向管道和stdout输出
