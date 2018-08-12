@@ -2,14 +2,17 @@
 
 users=$*
 users=${users// /\\|}
+prev=$(mktemp -t prev-XXXXXXXXX)
+curr=$(mktemp -t curr-XXXXXXXXX)
+trap 'rm -f $prev $curr' EXIT
 
-who | sort > prev
+who | sort > $prev
 while true
 do
     sleep 1
-    who | sort > curr
-    loggout=`comm -23 prev curr | grep "$users"`
-    login=`comm -13 prev curr | grep "$users"`
+    who | sort > $curr
+    loggout=`comm -23 $prev $curr | grep "$users"`
+    login=`comm -13 $prev $curr | grep "$users"`
     if [ ${#loggout} -gt 0 ]
     then
         echo "loggout out: "
@@ -20,5 +23,5 @@ do
         echo "logged in: "
         echo $login
     fi
-    mv curr prev
+    mv $curr $prev
 done
