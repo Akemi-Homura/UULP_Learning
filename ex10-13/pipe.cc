@@ -5,7 +5,20 @@
 
 # define oops(m,x) {perror(m); exit(x);}
 
-void createpipe(const char* cmd1,const char* cmd2){
+void createpipe(int tot,int now,char** argv);
+
+int main(int argc, char**argv){
+    if(argc < 3){
+        fprintf(stderr,"usage: pipe cmd1 cmd2 ...\n");
+        exit(1);
+    }
+    createpipe(argc,1,argv);
+    return 0;
+}
+
+void createpipe(int tot,int now,char **argv){
+    if(now == tot-1) return;
+
     int thepipe[2],
         pid;
 
@@ -23,8 +36,9 @@ void createpipe(const char* cmd1,const char* cmd2){
             oops("could not redirect stdin",3);
         }
         close(thepipe[0]);
-        execlp(cmd2,cmd2,NULL);
-        oops(cmd2,4);
+        createpipe(tot,now+1,argv);
+        execlp(argv[now+1],argv[now+1],NULL);
+        oops(argv[now+1],4);
     }
 
     close(thepipe[0]);
@@ -32,19 +46,6 @@ void createpipe(const char* cmd1,const char* cmd2){
         oops("could not redirect stdout",4);
     }
     close(thepipe[1]);
-    execlp(cmd1,cmd1,NULL);
-    oops(cmd1,5);
-}
-
-int main(int argc, char**argv){
-    if(argc < 3){
-        fprintf(stderr,"usage: pipe cmd1 cmd2...\n");
-        exit(1);
-    }
-
-    for(int i=1;i<argc-1;i++){
-        createpipe(argv[i],argv[i+1]);
-    }
-
-    return 0;
+    execlp(argv[now],argv[now],NULL);
+    oops(argv[now],5);
 }
