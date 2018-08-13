@@ -10,7 +10,7 @@
 # include <string.h>
 
 # define PORTNUM 13000
-# define IP      "10.214.59.236"
+# define IP      "0.0.0.0"
 # define HOSTLEN 256
 # define oops(msg)  {perror(msg); exit(1);}
 
