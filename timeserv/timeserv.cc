@@ -1,4 +1,5 @@
 # include <stdio.h>
+# include <arpa/inet.h>
 # include <stdlib.h>
 # include <unistd.h>
 # include <sys/types.h>
@@ -9,6 +10,7 @@
 # include <string.h>
 
 # define PORTNUM 13000
+# define IP      "10.214.59.236"
 # define HOSTLEN 256
 # define oops(msg)  {perror(msg); exit(1);}
 
@@ -36,7 +38,8 @@ int main(){
     gethostname(hostname, HOSTLEN);
     hp = gethostbyname( hostname );
 
-    memcpy((void*)&saddr.sin_addr, (void*)hp->h_addr,hp->h_length);
+    // memcpy((void*)&saddr.sin_addr, (void*)hp->h_addr,hp->h_length);
+    saddr.sin_addr.s_addr = inet_addr(IP);
     saddr.sin_port = htons(PORTNUM);
     saddr.sin_family = AF_INET;
 
