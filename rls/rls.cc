@@ -12,7 +12,7 @@
 
 # define DEBUG 0
 # define RELEASE 1
-# define RUNTYPE DEBUG
+# define RUNTYPE RELEASE
 
 int main(int ac,char** av){
     struct sockaddr_in servaddr;

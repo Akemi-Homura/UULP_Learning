@@ -1,4 +1,5 @@
 # include <stdio.h>
+# include <arpa/inet.h>
 # include <string.h>
 # include <ctype.h>
 # include <sys/socket.h>
@@ -11,18 +12,19 @@
 
 # define PORTNUM 15000
 # define HOSTLEN 256
+# define ADDRESS "0.0.0.0"
 # define oops(msg) {perror(msg); exit(1);}
 
 # define DEBUG 0
 # define RELEASE 1
-# define RUNTYPE DEBUG
+# define RUNTYPE RELEASE
 
 void sanitize(char *str);
 
 int main(){
     struct sockaddr_in saddr;
-    struct hostent *hp;
-    char hostname[HOSTLEN];
+    // struct hostent *hp;
+    // char hostname[HOSTLEN];
     int sock_id,sock_fd;
     FILE *sock_fpi, *sock_fpo;
     FILE *pipe_fp;
@@ -42,9 +44,11 @@ int main(){
      * Step 2: bind address to socket. Address is host,port
      */
     bzero((void*)&saddr,sizeof(saddr));
-    gethostname(hostname,HOSTLEN);
-    hp = gethostbyname(hostname);
-    bcopy((void*)hp->h_addr,(void*)&saddr.sin_addr,hp->h_length);
+    // gethostname(hostname,HOSTLEN);
+    // hp = gethostbyname(hostname);
+    // bcopy((void*)hp->h_addr,(void*)&saddr.sin_addr,hp->h_length);
+
+    saddr.sin_addr.s_addr = inet_addr(ADDRESS);
     saddr.sin_port = htons(PORTNUM);
     saddr.sin_family = AF_INET;
 
@@ -103,6 +107,7 @@ int main(){
 #if RUNTYPE == DEBUG
         printf("send complete\n");
 #endif
+        fflush(sock_fpo);
         pclose(pipe_fp);
         fclose(sock_fpi);
         fclose(sock_fpo);
@@ -113,7 +118,7 @@ int main(){
 void sanitize(char *str){
     char *src, *dest;
     for(src = dest = str; *src;src++){
-        if( *src == '/' || isalnum(*src)){
+        if( *src == '/' || isalnum(*src) || *src == '_' || *src == '-' || *src == '.' || *src == '+'){
             *dest++ = *src;
         }
     }
