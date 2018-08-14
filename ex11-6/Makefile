@@ -9,7 +9,3 @@ $(target): $(sources)
 
 clean:
 	rm -rf *.dSYM $(target)
-
-.PHONY: test
-test: $(target)
-	printf "2+2\n4*4\n2^32\n" | ./$(target)
