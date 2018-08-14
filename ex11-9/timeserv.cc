@@ -49,17 +49,18 @@ int main(){
     /*
      * main loop: accept(), write(), close()
      */
-    char clnt_addr_buf[INET_ADDRSTRLEN];
     while ( 1 ) {
-        struct sockaddr clnt_addr;
-        socklen_t addr_len;
-        sock_fd = accept(sock_id, &clnt_addr, &addr_len);
-        if(inet_ntop(AF_INET, &clnt_addr,clnt_addr_buf,addr_len) == NULL){
-            oops("inet_ntop");
-        }
-        struct hostent *hp = gethostbyaddr(&clnt_addr,addr_len,AF_INET);
+        struct sockaddr_in clnt_addr;
+        socklen_t addrlen;
+        sock_fd = accept(sock_id, (struct sockaddr*)&clnt_addr,&addrlen);
 
-        printf("Got a call from %s (%s)\n",clnt_addr_buf,hp->h_name);
+        char *clnt_addr_buf = inet_ntoa(clnt_addr.sin_addr);
+        struct in_addr hipaddr;
+        if(inet_aton(clnt_addr_buf,&hipaddr) == 0){
+            oops("inet_aton");
+        }
+
+        printf("Got a call from %s:%d\n",clnt_addr_buf,ntohs(clnt_addr.sin_port));
         if( sock_fd == -1 ){
             oops( "accept" );
         }
