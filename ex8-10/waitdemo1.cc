@@ -40,10 +40,11 @@ int main(int argc,char** argv){
 }
 
 void set_signal_handler(){
-    struct sigaction act;
-    act.sa_handler = child_exit_handler;
-    act.sa_flags   = SA_NODEFER  ;
-    sigaction(SIGCHLD,&act,NULL);
+    signal(SIGCHLD,child_exit_handler);
+    // struct sigaction act;
+    // act.sa_handler = child_exit_handler;
+    // act.sa_flags   = SA_NODEFER  ;
+    // sigaction(SIGCHLD,&act,NULL);
 }
 
 void child_code(int delay){
@@ -54,12 +55,13 @@ void child_code(int delay){
 }
 
 void child_exit_handler(int){
-    static int exit_nums = 0;
+    static int exitnum = 0;
+    int wait_rv;
 
-    int wait_rv = wait(NULL);
-    printf("done waiting for %d.\n",wait_rv);
-
-    if( ++exit_nums == pro_nums){
-        exit(0);
+    while((wait_rv = waitpid(-1,NULL,WNOHANG)) > 0){
+        printf("done waiting for %d.\n",wait_rv);
+        if( ++exitnum == pro_nums ){
+            exit(0);
+        }
     }
 }
