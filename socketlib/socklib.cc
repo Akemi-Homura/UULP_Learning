@@ -1,4 +1,5 @@
 # include <stdio.h>
+# include <string.h>
 # include <arpa/inet.h>
 # include <unistd.h>
 # include <sys/types.h>
@@ -22,7 +23,7 @@ int make_server_socket_q(int portnum,int backlog){
     struct sockaddr_in saddr;
     int sock_id;
 
-    sock_id = socket(PF_INET, SOCK_STREAM, 0);
+    sock_id = socket(AF_INET, SOCK_STREAM, 0);
     if( sock_id == -1 ){
         return -1;
     }
@@ -57,7 +58,7 @@ int connect_to_server(const char *host,int portnum){
     if( hp == NULL ){
         return -1;
     }
-    servadd.sin_addr.s_addr = inet_addr(hp->h_addr);
+    memcpy(&servadd.sin_addr,hp->h_addr,hp->h_length);
     servadd.sin_port        = htons(portnum);
     servadd.sin_family      = AF_INET;
 
