@@ -99,9 +99,9 @@ void *animate(void *arg){
     while(1){
         usleep(info->delay * TUNIT);
 
-        pthread_mutex_lock(&mx);
-        mvaddch(info->row,col,' ');
-        addstr(info->str);
+        pthread_mutex_lock(&mx);            /* only one thread */
+        mvaddch(info->row,col,' ');         /* can call curses */
+        addstr(info->str);                  /* at the same time */
         addch(' ');
         move(LINES-1,COLS-1);
         refresh();
