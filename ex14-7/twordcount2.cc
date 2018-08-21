@@ -32,6 +32,7 @@ int main(int ac,char **av){
         pthread_join(thds[i], NULL);
     }
     printf("%5d: total_words\n",total_words);
+    free(thds);
     return 0;
 }
 
