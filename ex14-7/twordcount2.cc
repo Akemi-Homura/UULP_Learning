@@ -7,6 +7,9 @@ int total_words;
 pthread_mutex_t counter_lock = PTHREAD_MUTEX_INITIALIZER;
 
 # define PRONAME "twordcount2"
+# define RELEASE    0
+# define DEBUG      1
+# define RUNTYPE    RELEASE
 
 void * count_words(void *);
 
@@ -23,7 +26,7 @@ int main(int ac,char **av){
 
     total_words = 0;
     for(int i=0;i<filenum;i++){
-        pthread_create(&thds[i], NULL, count_words, (void*)av[i]);
+        pthread_create(&thds[i], NULL, count_words, (void*)av[i+1]);
     }
     for(int i=0;i<filenum;i++){
         pthread_join(thds[i], NULL);
@@ -34,6 +37,9 @@ int main(int ac,char **av){
 
 void *count_words(void *f){
     const char* filename = (const char*)f;
+#if RUNTYPE == DEBUG
+    printf("filename: %s\n",filename);
+#endif
     FILE* fp;
     int c,prevc = '\0';
     if((fp = fopen(filename,"r")) != NULL){
